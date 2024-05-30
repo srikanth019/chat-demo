@@ -16,7 +16,6 @@ exports.ioServer = (app, sessionMiddleware) => {
   io.engine.use(sessionMiddleware);
 
   io.of("/roomList").on("connection", (socket) => {
-    console.log(/soc/, socket.request.session);
     console.log("New client connected", socket.id);
     socket.on("getChatRooms", () => {
       socket.emit("chatRoomList", JSON.stringify(allRooms));
