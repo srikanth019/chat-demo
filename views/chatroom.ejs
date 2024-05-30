@@ -5,31 +5,6 @@
     <title>ChatCat - <%= room %></title>
     <link rel="stylesheet" href="/css/chatRoom.css" />
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const socket = io("<%= host %>/chatter");
-        const roomId = "<%= roomId %>";
-        const userName = "<%= user.FullName %>";
-        const userPic = "<%= user.profilePicture %>";
-
-        socket.on("connect", () => {
-          socket.emit(
-            "join",
-            {
-              roomId,
-              userName,
-              userPic,
-            },
-            (error) => {
-              if (error) {
-                alert(error);
-                location.href = "/rooms";
-              }
-            }
-          );
-        });
-      });
-    </script>
   </head>
   <body>
     <div class="container">
@@ -73,17 +48,58 @@
             <a href="#" id="uploadFile" class="fileUploadBtn">Photo</a>
           </div>
         </div>
-        <div class="chatUsers">
-          <!-- Loop this for chat users -->
-          <div class="userBlock">
-            <div class="userPic">
-              <img src="/img/user.jpg" alt="John Doe" />
-            </div>
-            <div class="cuserName">John Doe</div>
-          </div>
-          <!-- loop end -->
-        </div>
+        <div class="chatUsers" id="chatUsers"></div>
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const socket = io("<%= host %>/chatter");
+        const roomId = "<%= roomId %>";
+        const userName = "<%= user.FullName %>";
+        const userPic = "<%= user.profilePicture %>";
+
+        socket.on("connect", () => {
+          socket.emit(
+            "join",
+            {
+              roomId,
+              userName,
+              userPic,
+            },
+            (error) => {
+              if (error) {
+                alert(error);
+                location.href = "/rooms";
+              }
+            }
+          );
+        });
+
+        const usersList = (user) => {
+          return `<div class="userBlock">
+            <div class="userPic">
+              <img src="${user.userPic}" alt="${user.userName}" />
+            </div>
+            <div class="cuserName">${user.userName}</div>
+          </div>`;
+        };
+
+        socket.on("updateUsersList", (data) => {
+          const parsedData = JSON.parse(data);
+          console.log(/data/, data);
+          const usersListEl = document.querySelector("#chatUsers");
+
+          // Check if usersListEl is not null
+          if (usersListEl) {
+            usersListEl.innerHTML = "";
+            parsedData.forEach((user) => {
+              usersListEl.innerHTML += usersList(user);
+            });
+          } else {
+            console.error("Element with id 'chatUsers' not found in the DOM.");
+          }
+        });
+      });
+    </script>
   </body>
 </html>

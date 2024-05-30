@@ -7,7 +7,7 @@ exports.ioServer = (app, sessionMiddleware) => {
   const io = new Server(server, {
     connectionStateRecovery: {},
   });
-  const allRooms = (app.locals.chatRooms = []);
+  let allRooms = (app.locals.chatRooms = []);
 
   // Share session middleware with socket.io
   // io.use((socket, next) => {
@@ -82,10 +82,28 @@ exports.ioServer = (app, sessionMiddleware) => {
       socket.join(data.roomId);
 
       //Update the list of active users on chat room page
-      console.log(/updated room/, room);
-      // socket.to(data.roomId).broadcast.emit("userJoined", data.username);
-      // socket.to(data.roomId).emit("userJoined", data.username);
+      socket.broadcast
+        .to(data.roomId)
+        .emit("updateUsersList", JSON.stringify(room.roomUsers));
+      socket.emit("updateUsersList", JSON.stringify(room.roomUsers));
+
       callback();
+    });
+
+    socket.on("disconnect", () => {
+      //Find the room to which socket is connected and remove the user
+      for (const room of allRooms) {
+        const index = room.roomUsers.findIndex(
+          (user) => user.socketId === socket.id
+        );
+        if (index > -1) {
+          socket.leave(room.roomId);
+          room.roomUsers.splice(index, 1);
+          socket.broadcast
+            .to(room.roomId)
+            .emit("updateUsersList", JSON.stringify(room.roomUsers));
+        }
+      }
     });
   });
 
