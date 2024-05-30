@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ChatCat - Rooms</title>
+    <link rel="stylesheet" href="./css/roomsStyles.css" />
+    <script src="/js/jquery-2.1.4.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const socket = io("<%= host %>/roomList");
+
+        socket.on("connect", () => {
+          console.log("Connected to the server");
+        });
+
+        socket.emit("getChatRooms");
+
+        socket.on("chatRoomList", (chatRooms) => {
+          const roomListEl = document.querySelector("#roomsListUL");
+          roomListEl.innerHTML = "";
+          JSON.parse(chatRooms).forEach((room) => {
+            const link = document.createElement("a");
+            link.href = `/chat/${room.roomId}`;
+
+            const listItem = document.createElement("li");
+            listItem.textContent = room.roomName;
+
+            link.appendChild(listItem);
+            roomListEl.appendChild(link);
+          });
+        });
+
+        // create a chat room
+        document.querySelector("#createBtn").addEventListener("click", (e) => {
+          e.preventDefault();
+          const roomName = document.querySelector("#roomName")?.value;
+          socket.emit("createChatRoom", roomName, (error) => {
+            if (error) {
+              alert(error);
+              location.href = "/rooms";
+            }
+          });
+          document.querySelector("#roomName").value = "";
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="titlePanel">
+        <h1>ChatCAT | Select or Create a Chatroom</h1>
+      </div>
+      <div class="controls">
+        <div class="userPicHolder">
+          <img src="<%= user.profilePicture %>" alt="<%= user.FullName %>" />
+        </div>
+        <p class="userName"><%= user.FullName %></p>
+        <a href="/logout" id="logOutBtn">Logout</a>
+      </div>
+      <div class="controls">
+        <input
+          type="text"
+          name="roomName"
+          placeholder="Create a new Chatroom"
+          id="roomName"
+        />
+        <a href="#" id="createBtn">Create</a>
+      </div>
+      <div class="roomsListDiv">
+        <ul class="roomsList" id="roomsListUL">
+          <!-- Loop list items here -->
+          <!-- <a href="chatroom.htm"><li>Coffee and Conversations</li></a> -->
+          <!-- Loop ends -->
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
