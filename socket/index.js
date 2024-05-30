@@ -39,6 +39,7 @@ exports.ioServer = (app, sessionMiddleware) => {
         roomId: generateRandomId(),
         roomUsers: [],
       };
+      console.log(/newRoom/, newRoom);
       allRooms.push(newRoom);
       //Emit event to the updated room to the creator
       socket.emit("chatRoomList", JSON.stringify(allRooms));
@@ -54,6 +55,7 @@ exports.ioServer = (app, sessionMiddleware) => {
 
   io.of("/chatter").on("connection", (socket) => {
     console.log("Chat room Client connected", socket.id);
+
     socket.on("join", (data, callback) => {
       //check of the is exist using allRooms and data.roomId
       const room = allRooms.find((room) => room.roomId === data.roomId);
@@ -78,6 +80,8 @@ exports.ioServer = (app, sessionMiddleware) => {
         userName: data.userName,
         userPic: data.userPic,
       });
+
+      console.log(/roomId/, data.roomId);
 
       socket.join(data.roomId);
 
@@ -104,6 +108,12 @@ exports.ioServer = (app, sessionMiddleware) => {
             .emit("updateUsersList", JSON.stringify(room.roomUsers));
         }
       }
+    });
+
+    socket.on("sendMessage", (data) => {
+      console.log(/sendMessage/, data.roomId);
+      // socket.emit("message", JSON.stringify(data));
+      socket.broadcast.to(data.roomId).emit("message", JSON.stringify(data));
     });
   });
 
