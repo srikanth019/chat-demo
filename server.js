@@ -1,9 +1,10 @@
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
-const connectDb = require("./db/index.js");
 const session = require("express-session");
 const passport = require("passport");
+const cors = require("cors");
+const connectDb = require("./db/index.js");
 
 require("./auth");
 
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors({ credentials: true }));
 
 app.use("/", router);
 app.get("*", (req, res) => {
