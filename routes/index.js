@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
 const { isAuthenticated } = require("../middleware/auth");
-const config = require("../config");
+const config = require("../config/config");
 const { upload } = require("../utils");
 
 router.get(
