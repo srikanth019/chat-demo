@@ -2,6 +2,7 @@ const router = require("express").Router();
 const passport = require("passport");
 const { isAuthenticated } = require("../middleware/auth");
 const config = require("../config");
+const { upload } = require("../utils");
 
 router.get(
   "/auth/google",
@@ -43,7 +44,6 @@ router.get("/", (req, res) => {
 });
 
 router.get("/rooms", isAuthenticated, (req, res) => {
-  console.log("/req.user", req.user);
   res.render("rooms", {
     user: req.user,
     host: config.host,
@@ -73,6 +73,16 @@ router.get("/logout", (req, res, next) => {
     }
     res.redirect("/");
   });
+});
+
+// Handle file upload
+router.post("/upload", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ success: false, message: "No file uploaded" });
+  }
+  res.json({ success: true, imageUrl: req.file.path });
 });
 
 module.exports = router;

@@ -31,6 +31,12 @@
               placeholder="Type here and press enter"
             />
             <a href="#" id="uploadFile" class="fileUploadBtn">Photo</a>
+            <input
+              type="file"
+              id="fileInput"
+              name="file"
+              style="display: none"
+            />
           </div>
         </div>
         <div class="chatUsers" id="chatUsers"></div>
@@ -107,22 +113,83 @@
 
         const createChatBlock = (message, userPic, userName) => {
           return `<div class="chatBlock">
-            <div class="userPic">
-              <img src="${userPic}" alt="${userName}" />
-            </div>
-            <div class="chatMsg">${message}</div>
-          </div>`;
+              <div class="userPic">
+                <img src="${userPic}" alt="${userName}" />
+              </div>
+              <div class="chatMsg">${message}</div>
+            </div>`;
         };
 
         socket.on("message", (data) => {
           const { message, userName, userPic, userId } = JSON.parse(data);
           const isSentByCurrentUser = userId === "<%= user._id %>";
+          console.log(/is/, isSentByCurrentUser);
           chatMessagesEl.innerHTML += createChatBlock(
             message,
             userPic,
             userName
           );
           chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Scroll to bottom
+        });
+
+        const createImageBlock = (imageUrl, userPic, userName) => {
+          return `<div class="chatBlock">
+            <div class="userPic">
+              <img src="${userPic}" alt="${userName}" />
+            </div>
+            <div class="chatMsg">
+              <img src="${imageUrl}" alt="${userName}'s upload" />
+            </div>
+          </div>`;
+        };
+
+        socket.on("image", (data) => {
+          console.log(/image/, data);
+          const { image, userName, userPic } = JSON.parse(data);
+          chatMessagesEl.innerHTML += createImageBlock(
+            image,
+            userPic,
+            userName
+          );
+          chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Scroll to bottom
+        });
+
+        const fileInputEl = document.querySelector("#fileInput");
+        const uploadFileBtn = document.querySelector("#uploadFile");
+
+        uploadFileBtn.addEventListener("click", () => {
+          fileInputEl.click();
+        });
+
+        fileInputEl.addEventListener("change", () => {
+          const file = fileInputEl.files[0];
+          if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("userName", userName);
+            formData.append("userPic", userPic);
+            formData.append("roomId", roomId);
+
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  socket.emit("sendImage", {
+                    image: data.imageUrl,
+                    fileName: file.name,
+                    userName,
+                    userPic,
+                    roomId,
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error("Error uploading file:", error);
+              });
+          }
         });
       });
     </script>

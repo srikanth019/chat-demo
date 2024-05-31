@@ -18,4 +18,9 @@ module.exports = {
     callbackURL: process.env.TWITTER_CALLBACK_URL,
     profileFields: process.env.TWITTER_PROFILE_FIELDS,
   },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
 };

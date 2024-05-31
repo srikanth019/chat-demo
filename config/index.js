@@ -13,6 +13,16 @@ if (process.env.NODE_ENV === "production") {
       callbackURL: process.env.host + "/auth/twitter/callback",
       profileFields: ["id", "displayName", "photos", "email"],
     },
+    google: {
+      clientID: process.env.clientID,
+      clientSecret: process.env.clientSecret,
+      callbackURL: process.env.host + "/auth/google/callback",
+    },
+    cloudinary: {
+      cloudName: process.env.cloudName,
+      apiKey: process.env.apiKey,
+      apiSecret: process.env.apiSecret,
+    },
   };
 } else {
   module.exports = require("./config.js");

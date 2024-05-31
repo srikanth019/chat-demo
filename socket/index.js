@@ -112,6 +112,11 @@ exports.ioServer = (app, sessionMiddleware) => {
       socket.broadcast.to(data.roomId).emit("message", JSON.stringify(data));
       socket.emit("message", JSON.stringify(data));
     });
+
+    socket.on("sendImage", (data) => {
+      socket.broadcast.to(data.roomId).emit("image", JSON.stringify(data));
+      socket.emit("image", JSON.stringify(data));
+    });
   });
 
   return server;
