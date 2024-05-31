@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors({ credentials: true }));
+app.use(cors());
 
 app.use("/", router);
 app.get("*", (req, res) => {
