@@ -39,7 +39,6 @@ exports.ioServer = (app, sessionMiddleware) => {
         roomId: generateRandomId(),
         roomUsers: [],
       };
-      console.log(/newRoom/, newRoom);
       allRooms.push(newRoom);
       //Emit event to the updated room to the creator
       socket.emit("chatRoomList", JSON.stringify(allRooms));
@@ -81,8 +80,6 @@ exports.ioServer = (app, sessionMiddleware) => {
         userPic: data.userPic,
       });
 
-      console.log(/roomId/, data.roomId);
-
       socket.join(data.roomId);
 
       //Update the list of active users on chat room page
@@ -111,9 +108,9 @@ exports.ioServer = (app, sessionMiddleware) => {
     });
 
     socket.on("sendMessage", (data) => {
-      console.log(/sendMessage/, data.roomId);
       // socket.emit("message", JSON.stringify(data));
       socket.broadcast.to(data.roomId).emit("message", JSON.stringify(data));
+      socket.emit("message", JSON.stringify(data));
     });
   });
 

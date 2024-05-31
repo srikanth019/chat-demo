@@ -22,21 +22,7 @@
       </div>
       <div class="chatListDiv">
         <div class="chatMessagesPanel">
-          <div class="chatMessages" id="chatMessages">
-            <!-- Loop this for chat messages -->
-            <!-- <div class="chatBlock">
-              <div class="userPic">
-                <img
-                  src="<%= user.profilePicture %>"
-                  alt="<%= user.FullName %>"
-                />
-              </div>
-              <div class="chatMsg">
-                Lorem ipsum dolor sit amet
-              </div>
-            </div> -->
-            <!-- loop end -->
-          </div>
+          <div class="chatMessages" id="chatMessages"></div>
           <div class="typePanel">
             <input
               type="text"
@@ -56,6 +42,7 @@
         const roomId = "<%= roomId %>";
         const userName = "<%= user.FullName %>";
         const userPic = "<%= user.profilePicture %>";
+        const userId = "<%= user._id %>";
 
         socket.on("connect", () => {
           socket.emit(
@@ -103,13 +90,13 @@
         userInputEl.addEventListener("keypress", (event) => {
           if (event.key === "Enter") {
             const message = userInputEl.value.trim();
-            console.log(/m/, message);
             if (message) {
               socket.emit("sendMessage", {
                 message,
                 userName,
                 userPic,
                 roomId,
+                userId,
               });
               userInputEl.value = "";
             }
@@ -128,8 +115,8 @@
         };
 
         socket.on("message", (data) => {
-          console.log(/message/, data);
-          const { message, userName, userPic } = JSON.parse(data);
+          const { message, userName, userPic, userId } = JSON.parse(data);
+          const isSentByCurrentUser = userId === "<%= user._id %>";
           chatMessagesEl.innerHTML += createChatBlock(
             message,
             userPic,

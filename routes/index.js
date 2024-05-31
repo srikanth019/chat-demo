@@ -43,6 +43,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/rooms", isAuthenticated, (req, res) => {
+  console.log("/req.user", req.user);
   res.render("rooms", {
     user: req.user,
     host: config.host,

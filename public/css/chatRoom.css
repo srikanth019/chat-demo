@@ -179,6 +179,7 @@ input[name="userInput"] {
   padding: 10px;
   margin: 16px;
   min-height: 32px;
+  border-radius: 10px;
 }
 
 .userPic {
@@ -188,11 +189,15 @@ input[name="userInput"] {
   top: 13px;
   left: 10px;
   background: rgba(0, 0, 0, 0.63);
+  border-radius: 50%; /* Makes the container round */
+  overflow: hidden; /* Ensures the image is contained within the rounded container */
 }
 
 .userPic > img {
-  width: 28px;
-  height: 28px;
+  width: 100%; /* Ensures the image fits the container */
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the container without distortion */
+  border-radius: 50%; /* Makes the image itself round */
 }
 
 .chatMsg {
